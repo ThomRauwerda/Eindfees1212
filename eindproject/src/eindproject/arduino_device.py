@@ -1,5 +1,7 @@
-import pyvisa
+# import pyvisa
 
+
+from eindproject.nsp2visasim import sim_pyvisa as pyvisa
 
 class ArduinoVISADevice:
     """Class were data will be measured from an active port.
@@ -27,6 +29,19 @@ class ArduinoVISADevice:
         """
         return self.device.query("*IDN?")
 
+    # def set_output_value(self, value):
+    #     """Set output voltage of device on channel 0
+
+    #     Args:
+    #         value (int): Voltage value channel 0 of the device will output
+
+    #     Returns:
+    #         int: the output Voltage channel 0 is set to
+    #     """
+    #     output_value = int(self.device.query(f"OUT:CH0 {value * (1023 / 3.3)}"))
+    #     return output_value
+
+
     def set_output_value(self, value):
         """Set output voltage of device on channel 0
 
@@ -36,7 +51,7 @@ class ArduinoVISADevice:
         Returns:
             int: the output Voltage channel 0 is set to
         """
-        output_value = int(self.device.query(f"OUT:CH0 {value * (1023 / 3.3)}"))
+        output_value = self.device.query(f"OUT:CH0 {value}")
         return output_value
 
     def get_output_value(self):
@@ -82,5 +97,8 @@ def list_devices():
     """
     rm = pyvisa.ResourceManager("@py")
     ports = rm.list_resources()
+    print(ports)
 
     return ports
+
+list_devices()

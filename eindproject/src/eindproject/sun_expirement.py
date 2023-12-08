@@ -1,5 +1,6 @@
 from eindproject.arduino_device import ArduinoVISADevice, list_devices
 import statistics as stat
+import numpy as np
 
 
 class DiodeExperiment:
@@ -38,23 +39,27 @@ class DiodeExperiment:
             self.error_voltage_led (list) : list containing average current errors for every bitvalue input on CH0.
             N (int) : number of times scan has been repeated.
         """
-        self.Voltage_led = []
+
+        start_bit = int(start * (1023/3.3))
+        stop_bit = int(stop * (1023/3.3))
+
+
         # We run every bit value.
-        for i in range(start, stop):
+        for i in range(start_bit, stop_bit):
             self.Voltage_led = []
             self.currents_led = []
 
             # For every Voltage value between start and stop we gather N times the current and the voltage over the led.
             for r in range(N):
-                self.device.set_output_value(i)
-                self.Voltage_led.append(int(self.device.get_input_voltage(1)) * 3)
-                self.error_current_led.append(self.device.get_input_voltage(2) / 4.7)
+                self.device.set_output_value(i * (1023/3.3))
+                self.Voltage_led.append(self.device.get_input_voltage(1) * 3)
+                self.currents_led.append(self.device.get_input_voltage(2) / 4.7)
 
 
             # From the N times we iterate over every Voltage value we calculate the mean Current and voltage and the errors for these values.
-            self.mean_Current_led.append(stat.mean(self.currents_led))
+            self.mean_Current_led.append(float(stat.mean(self.currents_led)))
             self.error_current_led.append(stat.stdev(self.currents_led) / (N**0.5))
-            self.mean_Voltage_led.append(stat.mean(self.Voltage_led))
+            self.mean_Voltage_led.append(float(stat.mean(self.Voltage_led)))
             self.error_voltage_led.append(stat.stdev(self.Voltage_led) / (N**0.5))
             N = N
 
@@ -64,10 +69,10 @@ class DiodeExperiment:
 
         return (
             N,
-            self.mean_Current_led,
-            self.mean_Voltage_led,
-            self.error_current_led,
-            self.error_voltage_led,
+            np.array(self.mean_Current_led),
+            np.array(self.mean_Voltage_led),
+            np.array(self.error_current_led),
+            np.array(self.error_voltage_led),
         )
 
     def Led_resistor_voltage(self):
@@ -94,4 +99,5 @@ def devices():
     returns:
         ports (list): list of all active ports.
     """
+
     return list_devices()

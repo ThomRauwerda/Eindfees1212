@@ -7,10 +7,23 @@ readme = "README.md"
 packages = [{include = "eindproject", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.13"
 pyvisa = "^1.14.1"
+matplotlib = "^3.8.2"
+pyvisa-py = "^0.7.1"
+zeroconf = "^0.128.0"
+psutil = "^5.9.6"
+pyserial = "^3.5"
+pyqtgraph = "^0.13.3"
+pyside6 = "^6.6.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks.compile]
+shell = """
+pyside6-uic src/eindproject/mainwindow.ui -o src/eindproject/ui_mainwindow.py
+"""
+interpreter = ["posix", "powershell"]
